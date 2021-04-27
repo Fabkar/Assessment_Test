@@ -1,9 +1,7 @@
 from django.urls import path
-
 from backend import views
-from django.conf.urls import url
 
 urlpatterns = [
-    # path('', views.index, name='index'),
-    path('users/', views.list_user),
+    path('', views.list_user, name="users"),
+    path('<gov_id>/', views.client_detail, name="detail users"),
 ]
