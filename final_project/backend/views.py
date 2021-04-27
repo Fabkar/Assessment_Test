@@ -1,4 +1,4 @@
-# from django.http import HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -8,8 +8,8 @@ from backend.models import Client, Order
 from backend.serializer import UserSerializer, OrderSerializer
 
 
-# def index(request):
-#     return HttpResponse("Hi everybody this is a company retailer")
+def index(request):
+    return HttpResponse("Hi everybody this is a company retailer")
 
 @api_view(["GET", "POST"])
 def list_user(request):
@@ -36,8 +36,8 @@ def list_user(request):
         return Response({'data': serializer.data ,
                          'count': paginator.count,
                          'numpages' : paginator.num_pages,
-                         'nextlink': '/api/backend/?page=' + str(nextPage),
-                         'prevlink': '/api/backend/?page=' + str(previousPage)})
+                         'nextlink': 'user/?page=' + str(nextPage),
+                         'prevlink': 'user/?page=' + str(previousPage)})
 
     elif request.method == "POST":
         serializer = UserSerializer(data=request.data)
@@ -48,7 +48,7 @@ def list_user(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def client_detail(request, gov_id):
-    """Retrieve, update or delete a customer by id/pk."""
+    """Retrieve, update or delete a customer by gov_id/pk."""
     try:
         client = Client.objects.get(pk=gov_id)
     except Client.DoesNotExist:
