@@ -4,17 +4,32 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAdminUser
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from backend.serializer import UserSerializer, OrderSerializer, ShippingSerializer, PaymentSerializer
 from backend.models import Client, Order, Shipping, Payment
-
+from rest_framework.authtoken.models import Token
+import hashlib
+from .models import ENV
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = UserSerializer
 
-    # @action(methods=['POST'], url_path='register', detail=True)
-    # def register_client(self, request):
+    @action(methods=['POST'], url_path='login', detail=False)
+    def login(self, request):
+        secret = ENV.get('SECRET')
+        email = request.data.get('email')
+        user = Client.objects.filter(email=email)
+        password = request.data.get('password')
+        if user is None:
+            return Response({'Error': 'Not user found'}, status=204)
+        self.password = hashlib.pbkdf2_hmac(
+            'sha256', self.password.encode(), secret.encode(), 100000).hex()
+        if password != user.get('password'):
+            return Response({'Error': 'Invalid password'}, status=204)
+        token = Token.objects.create(user)
+        return Response({'token': token}, status=201)
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -33,7 +48,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         orders = []
         for shipping in shippings:
             orders.append(OrderSerializer(shipping.order).data)
-        return Response({"orders": orders})
+        return Response({"orders": orders}, status=200)
 
 
     def get_queryset(self):
