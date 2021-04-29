@@ -4,7 +4,7 @@ from backend.models import Client, Order, Payment, Shipping
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = "__all__"
+        exclude = ['password']
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
